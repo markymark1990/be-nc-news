@@ -1,9 +1,9 @@
-# Northcoders News API
-
-For instructions, please head over to [L2C NC News](https://l2c.northcoders.com/courses/be/nc-news).
 
 
+In order to have access to the necessary environment variables, you will need to create a .env.test file and a .env.development file then update these in accordance with the correct database name for each. 
 
---- 
+Database names can be found in /db/setup.sql. 
 
-This portfolio project was created as part of a Digital Skills Bootcamp in Software Engineering provided by [Northcoders](https://northcoders.com/)
+Make sure env files are gitignored.
+
+
