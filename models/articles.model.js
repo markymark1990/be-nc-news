@@ -1,6 +1,18 @@
 const { promises } = require("supertest/lib/test.js")
 const db = require("../db/connection.js")
 
+
+exports.fetchArticles = (properties = '*', sortBy = 'created_at', orderBy = 'DESC') => {
+    return db.query(
+        `SELECT ${properties},
+        (SELECT COUNT(*) FROM comments WHERE comments.article_id = articles.article_id) AS comment_count
+         FROM articles  
+         ORDER BY ${sortBy} ${orderBy}`
+    ).then((res) => {
+        return res.rows
+    })
+}
+
 exports.fetchArticleById = (id) => {
     if(isNaN(id)) {
         return Promise.reject({status: 400, msg: "Bad Request"})
