@@ -6,6 +6,7 @@ const app = require("../app.js")
 const endpoints = require("../endpoints.json");
 const articles = require('../db/data/test-data/articles.js');
 
+
 //Re-Seed
 
 beforeEach(() => {
@@ -13,6 +14,7 @@ beforeEach(() => {
 });
 
 afterAll(() => db.end());
+
 
 //Endpoints
 
@@ -26,6 +28,7 @@ describe("GET /api", () => {
             })
     })
 })
+
 
 //Topics
 
@@ -53,6 +56,7 @@ describe("GET /api/topics", () => {
             });
     });
 });
+
 
 //Articles
 
@@ -142,23 +146,65 @@ describe("GET /api/articles/:article_id", () => {
                 expect(res.body.article).toHaveProperty("created_at")
                 expect(res.body.article).toHaveProperty("votes")
                 expect(res.body.article).toHaveProperty("article_img_url")
-              })
-            })
-    })
-    it("404: Not Found when article doesnt exist", () => {
-        return request(app)
+            });
+    });
+});
+it("404: Not Found when article doesnt exist", () => {
+    return request(app)
         .get("/api/articles/9999")
         .expect(404)
         .then((res) => {
             expect(res.body.msg).toBe("Not Found")
-        })
-    })
-    it("400: Bad Request when id is invalid", () => {
-        return request(app)
+        });
+});
+it("400: Bad Request when id is invalid", () => {
+    return request(app)
         .get("/api/articles/hello")
         .expect(400)
         .then((res) => {
             expect(res.body.msg).toBe("Bad Request")
-        })
-    })
+        });
+});
+
+describe("GET /api/articles/:article_id/comments", () => {
+    it("200: responds with an array of comments for a given article_id", () => {
+        return request(app)
+            .get("/api/articles/1/comments")
+            .expect(200)
+            .then((res) => {
+                res.body.comments.forEach(comment => {
+                    expect(comment).toHaveProperty("comment_id")
+                    expect(comment).toHaveProperty("body")
+                    expect(comment).toHaveProperty("author")
+                    expect(comment).toHaveProperty("votes")
+                    expect(comment).toHaveProperty("created_at")
+                });
+            });
+    });
+});
+it("200: responds with an array of comments for a given article_id in date order, most recent first", () => {
+    return request(app)
+        .get("/api/articles/1/comments")
+        .expect(200)
+        .then((res) => {
+                expect(res.body.comments).toBeSorted({ key: 'created_at', descending: true })       
+        });
+});
+it("404: Not Found when article doesnt exist", () => {
+    return request(app)
+        .get("/api/articles/9999/comments")
+        .expect(404)
+        .then((res) => {
+            expect(res.body.msg).toBe("Not Found")
+        });
+});
+it("400: Bad Request when id is invalid", () => {
+    return request(app)
+        .get("/api/articles/hello/comments")
+        .expect(400)
+        .then((res) => {
+            expect(res.body.msg).toBe("Bad Request")
+        });
+});
+
 
