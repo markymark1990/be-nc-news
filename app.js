@@ -1,7 +1,7 @@
 const express = require('express');
 const {getEndpoints} = require("./controllers/endpoints.controller.js");
 const {getTopics} = require("./controllers/topics.controller.js");
-const {getArticleById, getArticles} = require("./controllers/articles.controller.js");
+const {getArticleById, getArticles, getCommentsByArticleId} = require("./controllers/articles.controller.js");
 const app = express();
 
 //Endpoints
@@ -17,6 +17,8 @@ app.get("/api/topics", getTopics);
 app.get("/api/articles", getArticles);
 
 app.get("/api/articles/:article_id", getArticleById);
+
+app.get("/api/articles/:article_id/comments", getCommentsByArticleId)
 
 //Error Handling
 
