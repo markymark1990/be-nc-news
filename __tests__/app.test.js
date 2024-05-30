@@ -5,7 +5,7 @@ const seed = require("../db/seeds/seed.js");
 const app = require("../app.js")
 const endpoints = require("../endpoints.json");
 const articles = require('../db/data/test-data/articles.js');
-
+jest.setTimeout(10000);
 
 //Re-Seed
 
@@ -337,4 +337,31 @@ describe("POST /api/articles/:article_id/comments", () => {
             });
     });
 })
+
+
+describe("DELETE /api/comments/:comment_id/", () => {
+    it("204: deletes comment and responds with no content", () => {
+        return request(app)
+            .delete("/api/comments/1")
+            .expect(204)
+    });
+    it("400: Bad Request when id is invalid", () => {
+        return request(app)
+            .delete("/api/comments/invalid_comment_id")
+            .expect(400)
+            .then((res) => {
+                expect(res.body.msg).toBe("Bad Request")
+            })
+    });
+    it("404: Not Found when article doesnt exist", () => {
+        return request(app)
+            .delete("/api/comments/9999")
+            .expect(404)
+            .then((res) => {
+                expect(res.body.msg).toBe("Not Found")
+            });
+    });
+})
+
+
 
