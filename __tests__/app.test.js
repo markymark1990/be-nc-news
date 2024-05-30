@@ -148,23 +148,26 @@ describe("GET /api/articles/:article_id", () => {
                 expect(res.body.article).toHaveProperty("article_img_url")
             });
     });
+
+    it("404: Not Found when article doesnt exist", () => {
+        return request(app)
+            .get("/api/articles/9999")
+            .expect(404)
+            .then((res) => {
+                expect(res.body.msg).toBe("Not Found")
+            });
+    });
+    it("400: Bad Request when id is invalid", () => {
+        return request(app)
+            .get("/api/articles/hello")
+            .expect(400)
+            .then((res) => {
+                expect(res.body.msg).toBe("Bad Request")
+            });
+    });
 });
-it("404: Not Found when article doesnt exist", () => {
-    return request(app)
-        .get("/api/articles/9999")
-        .expect(404)
-        .then((res) => {
-            expect(res.body.msg).toBe("Not Found")
-        });
-});
-it("400: Bad Request when id is invalid", () => {
-    return request(app)
-        .get("/api/articles/hello")
-        .expect(400)
-        .then((res) => {
-            expect(res.body.msg).toBe("Bad Request")
-        });
-});
+
+//Comments
 
 describe("GET /api/articles/:article_id/comments", () => {
     it("200: responds with an array of comments for a given article_id", () => {
@@ -181,30 +184,90 @@ describe("GET /api/articles/:article_id/comments", () => {
                 });
             });
     });
-});
-it("200: responds with an array of comments for a given article_id in date order, most recent first", () => {
-    return request(app)
-        .get("/api/articles/1/comments")
-        .expect(200)
-        .then((res) => {
-                expect(res.body.comments).toBeSorted({ key: 'created_at', descending: true })       
-        });
-});
-it("404: Not Found when article doesnt exist", () => {
-    return request(app)
-        .get("/api/articles/9999/comments")
-        .expect(404)
-        .then((res) => {
-            expect(res.body.msg).toBe("Not Found")
-        });
-});
-it("400: Bad Request when id is invalid", () => {
-    return request(app)
-        .get("/api/articles/hello/comments")
-        .expect(400)
-        .then((res) => {
-            expect(res.body.msg).toBe("Bad Request")
-        });
+    it("200: responds with an array of comments for a given article_id in date order, most recent first", () => {
+        return request(app)
+            .get("/api/articles/1/comments")
+            .expect(200)
+            .then((res) => {
+                expect(res.body.comments).toBeSorted({ key: 'created_at', descending: true })
+            });
+    });
+    it("404: Not Found when article doesnt exist", () => {
+        return request(app)
+            .get("/api/articles/9999/comments")
+            .expect(404)
+            .then((res) => {
+                expect(res.body.msg).toBe("Not Found")
+            });
+    });
+    it("400: Bad Request when id is invalid", () => {
+        return request(app)
+            .get("/api/articles/hello/comments")
+            .expect(400)
+            .then((res) => {
+                expect(res.body.msg).toBe("Bad Request")
+            });
+    });
+
 });
 
+describe("POST /api/articles/:article_id/comments", () => {
+    it("201: responds with comment added to article", () => {
+        const comment = {
+            username: "butter_bridge",
+            body: "Nice article"
+        }
+        return request(app)
+            .post("/api/articles/1/comments")
+            .send(comment)
+            .expect(201)
+            .then((res) => {
+                    expect(res.body.comment).toHaveProperty("comment_id")
+                    expect(res.body.comment).toHaveProperty("body", "Nice article")
+                    expect(res.body.comment).toHaveProperty("article_id", 1)
+                    expect(res.body.comment).toHaveProperty("author", "butter_bridge")
+                    expect(res.body.comment).toHaveProperty("votes")
+                    expect(res.body.comment).toHaveProperty("created_at")
+            });
+    });
+    it("400: Bad Request when property missing", () => {
+        const comment = {
+            username: "butter_bridge",
+            body: ""
+        }
+        return request(app)
+            .post("/api/articles/1/comments")
+            .send(comment)
+            .expect(400)
+            .then((res) => {
+                expect(res.body.msg).toBe("Bad Request")
+            });
+    });
+    it("400: Bad Request when id is invalid", () => {
+        const comment = {
+            username: "butter_bridge",
+            body: "Nice article"
+        }
+        return request(app)
+            .post("/api/articles/notAValidId/comments")
+            .send(comment)
+            .expect(400)
+            .then((res) => {
+                expect(res.body.msg).toBe("Bad Request")
+            });
+    });
+    it("404: Not Found when article doesnt exist", () => {
+        const comment = {
+            username: "butter_bridge",
+            body: "Nice article"
+        }
+        return request(app)
+            .post("/api/articles/9999/comments")
+            .send(comment)
+            .expect(404)
+            .then((res) => {
+                expect(res.body.msg).toBe("Not Found")
+            });
+    });
+})
 
