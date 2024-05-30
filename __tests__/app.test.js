@@ -61,29 +61,9 @@ describe("GET /api/topics", () => {
 //Articles
 
 describe("GET /api/articles", () => {
-    it("200: responds with all articles sorted by date in descending order by default", () => {
+    it("200: responds with all articles except for 'body' sorted by date in descending order by default", () => {
         return request(app)
             .get("/api/articles")
-            .expect(200)
-            .then((res) => {
-                expect(Array.isArray(res.body.articles)).toBe(true);
-                expect(res.body.articles.length).toBe(13);
-                res.body.articles.forEach(article => {
-                    expect(article).toHaveProperty('author');
-                    expect(article).toHaveProperty('title');
-                    expect(article).toHaveProperty('article_id');
-                    expect(article).toHaveProperty('body');
-                    expect(article).toHaveProperty('topic');
-                    expect(article).toHaveProperty('created_at');
-                    expect(article).toHaveProperty('votes');
-                    expect(article).toHaveProperty('article_img_url');
-                })
-                expect(res.body.articles).toBeSorted({ key: 'created_at', descending: true });
-            })
-    });
-    it("200: responds with all articles sorted by date in descending order omitting the body property", () => {
-        return request(app)
-            .get("/api/articles?properties=author,title,article_id,topic,created_at,votes,article_img_url")
             .expect(200)
             .then((res) => {
                 expect(Array.isArray(res.body.articles)).toBe(true);
@@ -122,6 +102,18 @@ describe("GET /api/articles", () => {
                 expect(res.body.articles).toBeSorted({ key: 'created_at', descending: true });
             })
     });
+    it("200: responds with articles filtered by topic", () => {
+        return request(app)
+            .get("/api/articles?topic=mitch")
+            .expect(200)
+            .then((res) => {
+                expect(Array.isArray(res.body.articles)).toBe(true);
+                expect(res.body.articles.length).toBe(12);
+                res.body.articles.forEach(article => {
+                    expect(article.topic).toBe('mitch');
+                });
+            });
+     });
     it("404: Not Found when route does not exist", () => {
         return request(app)
             .get("/api/notARoute")
@@ -148,7 +140,6 @@ describe("GET /api/articles/:article_id", () => {
                 expect(res.body.article).toHaveProperty("article_img_url")
             });
     });
-
     it("404: Not Found when article doesnt exist", () => {
         return request(app)
             .get("/api/articles/9999")
@@ -233,6 +224,7 @@ describe("PATCH /api/articles/:article_id", () => {
             });
     });
 });
+
 
 //Comments
 
@@ -362,6 +354,7 @@ describe("DELETE /api/comments/:comment_id/", () => {
             });
     });
 })
+
 
 //Users
 
