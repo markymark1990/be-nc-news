@@ -1,4 +1,4 @@
-const { fetchCommentsByArticleId, fetchPostCommentToArticle } = require("../models/comments.model.js");
+const { fetchCommentsByArticleId, addCommentToArticle } = require("../models/comments.model.js");
 
 exports.getCommentsByArticleId = (req, res, next) => {
     const { article_id } = req.params
@@ -12,7 +12,7 @@ exports.getCommentsByArticleId = (req, res, next) => {
 exports.postCommentToArticle = (req, res, next) => {
     const { article_id } = req.params
     const { username, body } = req.body
-    fetchPostCommentToArticle(article_id, username, body)
+    addCommentToArticle(article_id, username, body)
         .then((comment) => {
             res.status(201).send({ comment })
         })

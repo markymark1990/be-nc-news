@@ -159,7 +159,74 @@ describe("GET /api/articles/:article_id", () => {
     });
     it("400: Bad Request when id is invalid", () => {
         return request(app)
-            .get("/api/articles/hello")
+            .get("/api/articles/invalid_article_id")
+            .expect(400)
+            .then((res) => {
+                expect(res.body.msg).toBe("Bad Request")
+            });
+    });
+});
+
+describe("PATCH /api/articles/:article_id", () => {
+    it("200: responds with an updated article with increased votes value as specified", () => {
+        const addVote = { inc_votes: 5 }
+        return db.query(
+            `SELECT votes
+             FROM articles
+             WHERE article_id = 1`
+        ).then((result) => {
+            const updatedVotes = result.rows[0].votes + 5
+            return request(app)
+                .patch("/api/articles/1")
+                .send(addVote)
+                .expect(200)
+                .then((res) => {
+                    expect(res.body.article).toHaveProperty("article_id", 1)
+                    expect(res.body.article).toHaveProperty("votes", updatedVotes)
+                });
+        })
+    });
+    it("200: responds with an updated article with decreased votes value as specified", () => {
+        const addVote = { inc_votes: -5 }
+        return db.query(
+            `SELECT votes
+             FROM articles
+             WHERE article_id = 1`
+        ).then((result) => {
+            const updatedVotes = result.rows[0].votes - 5
+            return request(app)
+                .patch("/api/articles/1")
+                .send(addVote)
+                .expect(200)
+                .then((res) => {
+                    expect(res.body.article).toHaveProperty("article_id")
+                    expect(res.body.article).toHaveProperty("votes")
+                });
+        })
+    });
+    it("400: Bad Request when inc_votes is missing", () => {
+        return request(app)
+            .patch("/api/articles/1")
+            .expect(400)
+            .then((res) => {
+                expect(res.body.msg).toBe("Bad Request")
+            });
+    });
+    it("404: Not Found when article doesnt exist", () => {
+        const addVote = { inc_votes: 5 }
+        return request(app)
+            .patch("/api/articles/9999")
+            .send(addVote)
+            .expect(404)
+            .then((res) => {
+                expect(res.body.msg).toBe("Not Found")
+            });
+    });
+    it("400: Bad Request when id is invalid", () => {
+        const addVote = { inc_votes: 5 }
+        return request(app)
+            .patch("/api/articles/invalid_article_id")
+            .send(addVote)
             .expect(400)
             .then((res) => {
                 expect(res.body.msg).toBe("Bad Request")
@@ -202,7 +269,7 @@ describe("GET /api/articles/:article_id/comments", () => {
     });
     it("400: Bad Request when id is invalid", () => {
         return request(app)
-            .get("/api/articles/hello/comments")
+            .get("/api/articles/invalid_article_id/comments")
             .expect(400)
             .then((res) => {
                 expect(res.body.msg).toBe("Bad Request")
@@ -222,12 +289,12 @@ describe("POST /api/articles/:article_id/comments", () => {
             .send(comment)
             .expect(201)
             .then((res) => {
-                    expect(res.body.comment).toHaveProperty("comment_id")
-                    expect(res.body.comment).toHaveProperty("body", "Nice article")
-                    expect(res.body.comment).toHaveProperty("article_id", 1)
-                    expect(res.body.comment).toHaveProperty("author", "butter_bridge")
-                    expect(res.body.comment).toHaveProperty("votes")
-                    expect(res.body.comment).toHaveProperty("created_at")
+                expect(res.body.comment).toHaveProperty("comment_id")
+                expect(res.body.comment).toHaveProperty("body", "Nice article")
+                expect(res.body.comment).toHaveProperty("article_id", 1)
+                expect(res.body.comment).toHaveProperty("author", "butter_bridge")
+                expect(res.body.comment).toHaveProperty("votes")
+                expect(res.body.comment).toHaveProperty("created_at")
             });
     });
     it("400: Bad Request when property missing", () => {
@@ -249,7 +316,7 @@ describe("POST /api/articles/:article_id/comments", () => {
             body: "Nice article"
         }
         return request(app)
-            .post("/api/articles/notAValidId/comments")
+            .post("/api/articles/invalid_article_id/comments")
             .send(comment)
             .expect(400)
             .then((res) => {

@@ -13,14 +13,16 @@ exports.fetchCommentsByArticleId = (article_id) => {
          WHERE article_id = $1
          ORDER BY created_at DESC`, [article_id]
     ).then((res) => {
+
         if (res.rows.length === 0) {
             return Promise.reject({ status: 404, msg: "Not Found" })
         }
+        
         return res.rows
     })
 }
 
-exports.fetchPostCommentToArticle = (article_id, username, body) => {
+exports.addCommentToArticle = (article_id, username, body) => {
 
     if (!username || !body) {
         return Promise.reject({ status: 400, msg: "Bad Request" });
