@@ -29,3 +29,21 @@ exports.fetchArticleById = (article_id) => {
         return res.rows[0]
     })
 }
+
+
+exports.updateArticleById = (article_id, newVote) => {
+    if(isNaN(article_id) || isNaN(newVote)) {
+        return Promise.reject({status: 400, msg: "Bad Request"})
+    }
+    return db.query(
+        `UPDATE articles 
+         SET votes = votes + $2
+         WHERE article_id = $1
+         RETURNING *`, [article_id, newVote]
+    ).then((res) => { 
+        if(res.rows.length === 0) {
+            return Promise.reject({status: 404, msg: "Not Found"})
+        }
+        return res.rows[0]
+    })
+}
