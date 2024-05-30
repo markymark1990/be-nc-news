@@ -363,5 +363,32 @@ describe("DELETE /api/comments/:comment_id/", () => {
     });
 })
 
+//Users
+
+describe("GET /api/users", () => {
+    it("200: responds with all users", () => {
+        return request(app)
+            .get("/api/users")
+            .expect(200)
+            .then((res) => {
+                expect(Array.isArray(res.body.users)).toBe(true);
+                expect(res.body.users.length).toBe(4);
+                res.body.users.forEach(user => {
+                    expect(user).toHaveProperty('username');
+                    expect(user).toHaveProperty('name');
+                    expect(user).toHaveProperty('avatar_url');
+                })
+            })
+    });
+    it("404: Not Found when route does not exist", () => {
+        return request(app)
+            .get("/api/notARoute")
+            .expect(404)
+            .then((res) => {
+                expect(res.body.msg).toBe("Not Found");
+            });
+    });
+});
+
 
 
