@@ -2,8 +2,8 @@ const {fetchArticles, fetchArticleById, updateArticleById} = require("../models/
 
 
 exports.getArticles = (req, res, next) => {
-    const {properties, sortBy, orderBy} = req.query
-    fetchArticles(properties, sortBy, orderBy)
+    const {properties, sortBy, orderBy, topic} = req.query
+    fetchArticles(properties, sortBy, orderBy, topic)
         .then((articles) => {
         res.status(200).send({articles});
     })

@@ -2,13 +2,24 @@ const { promises } = require("supertest/lib/test.js")
 const db = require("../db/connection.js")
 
 
-exports.fetchArticles = (properties = '*', sortBy = 'created_at', orderBy = 'DESC') => {
-    return db.query(
-        `SELECT ${properties},
-        (SELECT COUNT(*) FROM comments WHERE comments.article_id = articles.article_id) AS comment_count
-         FROM articles  
-         ORDER BY ${sortBy} ${orderBy}`
-    ).then((res) => {
+exports.fetchArticles = (properties = 'author,title,article_id,topic,created_at,votes,article_img_url', sortBy = 'created_at', orderBy = 'DESC', topic) => {
+
+    let queryStr = `
+     SELECT ${properties},
+    (SELECT COUNT(*) FROM comments WHERE comments.article_id = articles.article_id) AS comment_count
+     FROM articles`
+
+     const queryVals = []
+
+     if (topic) {
+        queryStr += ` WHERE topic = $1`
+        queryVals.push(topic)
+     }
+
+     queryStr +=  ` ORDER BY ${sortBy} ${orderBy}`
+
+     return db.query(queryStr, queryVals)
+     .then((res) => {
         return res.rows
     })
 }
