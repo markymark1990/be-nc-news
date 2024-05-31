@@ -30,7 +30,8 @@ exports.fetchArticleById = (article_id) => {
         return Promise.reject({status: 400, msg: "Bad Request"})
     }
     return db.query(
-        `SELECT * 
+        `SELECT *,
+        (SELECT COUNT(*) FROM comments WHERE comments.article_id = articles.article_id) AS comment_count 
          FROM articles 
          WHERE article_id = $1`, [article_id]
     ).then((res) => { 
