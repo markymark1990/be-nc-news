@@ -1,4 +1,4 @@
-const { promises } = require("supertest/lib/test.js")
+// const { promises } = require("supertest/lib/test.js")
 const db = require("../db/connection.js")
 
 exports.fetchUsers = () => {
