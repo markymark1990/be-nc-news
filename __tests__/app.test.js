@@ -38,7 +38,6 @@ describe("GET /api/topics", () => {
             .get("/api/topics")
             .expect(200)
             .then((res) => {
-                expect(Array.isArray(res.body.topics)).toBe(true);
                 expect(res.body.topics.length).toBe(3);
                 res.body.topics.forEach(topic => {
                     expect(topic).toHaveProperty('description');
@@ -47,14 +46,7 @@ describe("GET /api/topics", () => {
                 })
             })
     });
-    it("404: Not Found when route does not exist", () => {
-        return request(app)
-            .get("/api/notARoute")
-            .expect(404)
-            .then((res) => {
-                expect(res.body.msg).toBe("Not Found");
-            });
-    });
+
 });
 
 
@@ -65,8 +57,7 @@ describe("GET /api/articles", () => {
         return request(app)
             .get("/api/articles")
             .expect(200)
-            .then((res) => { 
-                expect(Array.isArray(res.body.articles)).toBe(true);
+            .then((res) => {
                 expect(res.body.articles.length).toBe(13);
                 res.body.articles.forEach(article => {
                     expect(article).toHaveProperty('author');
@@ -87,19 +78,18 @@ describe("GET /api/articles", () => {
             .get("/api/articles?topic=mitch")
             .expect(200)
             .then((res) => {
-                expect(Array.isArray(res.body.articles)).toBe(true);
                 expect(res.body.articles.length).toBe(12);
                 res.body.articles.forEach(article => {
                     expect(article.topic).toBe('mitch');
                 });
             });
-     });
-    it("404: Not Found when route does not exist", () => {
+    });
+    it("404: Not Found when invalid topic is given", () => {
         return request(app)
-            .get("/api/notARoute")
+            .get("/api/articles?topic=invalid")
             .expect(404)
             .then((res) => {
-                expect(res.body.msg).toBe("Not Found");
+                expect(res.body.msg).toBe("Not Found")
             });
     });
 });
@@ -172,7 +162,7 @@ describe("PATCH /api/articles/:article_id", () => {
                 .expect(200)
                 .then((res) => {
                     expect(res.body.article).toHaveProperty("article_id")
-                    expect(res.body.article).toHaveProperty("votes")
+                    expect(res.body.article).toHaveProperty("votes", updatedVotes)
                 });
         })
     });
@@ -215,6 +205,7 @@ describe("GET /api/articles/:article_id/comments", () => {
             .get("/api/articles/1/comments")
             .expect(200)
             .then((res) => {
+                expect (res.body.comments.length).toBeGreaterThan(1)
                 res.body.comments.forEach(comment => {
                     expect(comment).toHaveProperty("comment_id")
                     expect(comment).toHaveProperty("body")
@@ -345,7 +336,6 @@ describe("GET /api/users", () => {
             .get("/api/users")
             .expect(200)
             .then((res) => {
-                expect(Array.isArray(res.body.users)).toBe(true);
                 expect(res.body.users.length).toBe(4);
                 res.body.users.forEach(user => {
                     expect(user).toHaveProperty('username');
@@ -354,6 +344,12 @@ describe("GET /api/users", () => {
                 })
             })
     });
+    
+});
+
+//General Errors
+
+describe("/invalid endpoint", () => {
     it("404: Not Found when route does not exist", () => {
         return request(app)
             .get("/api/notARoute")
@@ -362,7 +358,7 @@ describe("GET /api/users", () => {
                 expect(res.body.msg).toBe("Not Found");
             });
     });
-});
+})
 
 
 

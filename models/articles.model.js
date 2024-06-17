@@ -20,6 +20,9 @@ exports.fetchArticles = (properties = 'author,title,article_id,topic,created_at,
 
      return db.query(queryStr, queryVals)
      .then((res) => {
+        if (res.rows.length === 0 && topic) {
+            return Promise.reject({ status: 404, msg: "Not Found" })
+        }
         return res.rows
     })
 }
