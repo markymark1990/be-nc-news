@@ -2,7 +2,16 @@ const {fetchArticles, fetchArticleById, updateArticleById} = require("../models/
 
 
 exports.getArticles = (req, res, next) => {
-    const {properties, sortBy, orderBy, topic} = req.query
+    const {properties, sort_by, order, topic} = req.query
+
+     // Validate sort_by and set default if not provided
+     const validSortColumns = ['created_at', 'votes', 'comment_count'];
+     const sortBy = validSortColumns.includes(sort_by) ? sort_by : 'created_at';
+ 
+     // Validate order and set default if not provided
+     const validOrders = ['asc', 'desc'];
+     const orderBy = validOrders.includes(order) ? order.toUpperCase() : 'DESC';
+
     fetchArticles(properties, sortBy, orderBy, topic)
         .then((articles) => {
         res.status(200).send({articles});

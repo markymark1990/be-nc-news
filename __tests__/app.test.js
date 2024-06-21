@@ -129,6 +129,48 @@ describe("GET /api/articles/:article_id", () => {
     });
 });
 
+describe("GET /api/articles sorting", () => {
+    it("200: responds with articles sorted by created_at in descending order by default", () => {
+        return request(app)
+            .get("/api/articles")
+            .expect(200)
+            .then((res) => {
+                expect(res.body.articles.length).toBe(13);
+                expect(res.body.articles).toBeSorted({ key: 'created_at', descending: true });
+            });
+    });
+
+    it("200: responds with articles sorted by votes in ascending order", () => {
+        return request(app)
+            .get("/api/articles?sort_by=votes&order=asc")
+            .expect(200)
+            .then((res) => {
+                expect(res.body.articles.length).toBe(13);
+                expect(res.body.articles).toBeSorted({ key: 'votes', descending: false });
+            });
+    });
+
+    it("200: responds with articles sorted by created_at in ascending order", () => {
+        return request(app)
+            .get("/api/articles?sort_by=created_at&order=asc")
+            .expect(200)
+            .then((res) => {
+                expect(res.body.articles.length).toBe(13);
+                expect(res.body.articles).toBeSorted({ key: 'created_at', descending: false });
+            });
+    });
+
+    it("200: responds with articles sorted by votes in descending order", () => {
+        return request(app)
+            .get("/api/articles?sort_by=votes&order=desc")
+            .expect(200)
+            .then((res) => {
+                expect(res.body.articles.length).toBe(13);
+                expect(res.body.articles).toBeSorted({ key: 'votes', descending: true });
+            });
+    });
+});
+
 describe("PATCH /api/articles/:article_id", () => {
     it("200: responds with an updated article with increased votes value as specified", () => {
         const addVote = { inc_votes: 5 }
@@ -359,6 +401,7 @@ describe("/invalid endpoint", () => {
             });
     });
 })
+
 
 
 
